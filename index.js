@@ -39,6 +39,7 @@ io.on('connection', function(socket) {
 			vx: 0,
 			vy: 0,
 			health: 100,
+			damage: 5,
 			kills: 0,
 			name: "Player: " + socket.id,
 			id: socket.id
@@ -47,21 +48,33 @@ io.on('connection', function(socket) {
 		send()
 		socket.on("Movement", function(position) {
 			send();
+			if(position.x != 0 && position.y != 0) {
+				position.x /= 2;
+				position.y /= 2;
+			}
 			players[socket.id].vx += position.x;
 			players[socket.id].vy += position.y;
 		});
 		socket.on("Shoot", function(position, angle) {
 			if(canshoot) {
+				var attackdamage = 0;
+				for(i in players) {
+					p = players[i];
+					if(p.id == socket.id) {
+						attackdamage = p.damage;
+					}
+				}
 				bullets[Math.random()] = {
 					x: position[0],
 					y: position[1],
 					vx: Math.cos(angle)*50,
 					vy: Math.sin(angle)*50,
 					lifetime: 150,
+					damage: attackdamage,
 					id: socket.id
 				}
 				canshoot = false;
-				setTimeout(function(){canshoot = true}, 50);
+				setTimeout(function(){canshoot = true}, 100);
 			}
 		});
 		socket.on("Name", function(name) {
@@ -107,7 +120,7 @@ function update() {
 						}
 						send();
 					}
-					p.health -= 5;
+					p.health -= b.damage;
 					delete bullets[i];
 			}
 		}

@@ -1,14 +1,3 @@
-var socket = io();
-var players = {};
-var bullets = {};
-var ammount;
-var verbs = ["galloping", "running", "playing", "killing"]
-var nouns = ["human", "horse", "zombie", "stone", "player"]
-var position = [0, 0];
-var floors = [];
-var movement = {x: 0, y: 0};
-var scroll = [0, 0]
-const keystate = [];
 function Play() {
 	var name = document.getElementById("username").value;
 	if (name == " " || name == "" || name.length < 2) {
@@ -25,116 +14,30 @@ function Play() {
 	});
 	document.getElementById("JoinScreen").style.display = "none";
 }
+
 socket.emit("Movement", movement);
-window.addEventListener('keydown', e => {
-  if (!keystate[e.keyCode]) {
-    keystate[e.keyCode] = true;
-  }
-});
-
-window.addEventListener('keyup', e => {
-  delete keystate[e.keyCode];
-});
-
-function rand(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
 
 function setup() {
   createCanvas(windowWidth,windowHeight);
 }
 
-function rectangle(x, y, w, h) {
-  rect(x - w/2, y - h/2, w, h);
-}
-
-function oval(x, y, r) {
-  circle(y, x, r);
-}
-
 function draw() {
   background("#33aaff");
-	//environment
-	for(i in floors) {
-		f = floors[i];
-		let c = color(f[4]);
-		fill(c);
-		rectangle(f[0]*5 - scroll[0], f[1]*5 - scroll[1], f[2]*5, f[3]*5);
-	}
-
-  //bullets
-	for(i in bullets) {
-		b = bullets[i];
-		let c = color('#656565');
-		fill(c);
-		rectangle(b.x - scroll[0], b.y - scroll[1], 25, 25);
-	}
-
-	//players
-	for(i in players) {
-		p = players[i];
-		if(p.id == socket.id) {
-			let c = color('#66ff66');
-			fill(c);
-			noStroke();
-			rectangle(p.x - scroll[0], p.y - scroll[1], 50, 50);
-			position = [p.x, p.y]
-		} else {
-			let c = color('#ff6565');
-			fill(c);
-			noStroke();
-			rectangle(p.x - scroll[0], p.y - scroll[1], 50, 50);
-		}
-		textSize(32);
-		text(p.kills + " | " + p.name, p.x - scroll[0], p.y - scroll[1] - 60);
-		textAlign(CENTER);
-		let c;
-		c = color("#aaaaaa");
-		fill(c)
-		rectangle(p.x - scroll[0], p.y - scroll[1] - 45, 100, 10);
-		if(p.id == socket.id) {
-			c = color("#66ff66")
-		} else {
-			c = color("#ff6565")
-		}
-		fill(c);
-		rectangle(p.x - scroll[0] + p.health/2 - 50, p.y - scroll[1] - 45, p.health, 10);
-	}
-	movement.x = 0;
-	movement.y = 0;
-	if (keystate[87]) {
-		movement.y--;
-		socket.emit("Movement", movement);
-	}
-
-	if (keystate[65]) {
-		movement.x--;
-		socket.emit("Movement", movement);
-	}
-	
-	if (keystate[83]) {
-		movement.y++;
-		socket.emit("Movement", movement);
-	}
-
-	if (keystate[68]) {
-		movement.x++;
-		socket.emit("Movement", movement);
-	}
-	if (keystate[32]) {
-		var angle = 	angle = atan2(mouseY - height / 2, mouseX - width / 2);
-		socket.emit("Shoot", position, angle);
-	}
-	console.log(movement)
-
-  scroll[0] += (position[0] - scroll[0] - windowWidth/2) / 7;
-	scroll[1] += (position[1] - scroll[1] - windowHeight/2) / 7;
+	renderFloors();
+	renderBullets();
+	renderPlayers();
+	move();
 }
 
-function mouseClicked() {
-	var angle = atan2(mouseY - height / 2, mouseX - width / 2);
-  socket.emit("Shoot", position, angle);
-}
+document.body.innerHTML += `
+		<div id="JoinScreen">
+			<div id="container">
+				<h1>Rectangular Battle</h1>
+				<input id="username" placeholder="Username" maxlength="14">
+				<button id="play" onclick="Play()">Play</button>
+			</div>
+		</div>
+`
 
 socket.on("players", function(pack){
 	players = pack;
