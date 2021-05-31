@@ -4,10 +4,10 @@ var bullets = {};
 var ammount;
 var verbs = ["galloping", "running", "playing", "killing"]
 var nouns = ["human", "horse", "zombie", "stone", "player"]
+var position = [0, 0];
 var floors = [];
-var velocity = [0, 0];
+var movement = {x: 0, y: 0};
 var scroll = [0, 0]
-var position = [rand(-250, 250), rand(-250, 250)];
 const keystate = [];
 function Play() {
 	var name = document.getElementById("username").value;
@@ -16,7 +16,7 @@ function Play() {
 	}
 	socket.emit("PlayerConnect");
 	socket.emit("Name", name);
-	socket.emit("Position", position);
+	socket.emit("Movement", movement);
 	socket.on('floors', data => {
 		for (const [key, value] of Object.entries(data)) {
 			console.log(value.x, value.y, value.w, value.h, value.c);
@@ -25,7 +25,7 @@ function Play() {
 	});
 	document.getElementById("JoinScreen").style.display = "none";
 }
-socket.emit("Position", position);
+socket.emit("Movement", movement);
 window.addEventListener('keydown', e => {
   if (!keystate[e.keyCode]) {
     keystate[e.keyCode] = true;
@@ -78,6 +78,7 @@ function draw() {
 			fill(c);
 			noStroke();
 			rectangle(p.x - scroll[0], p.y - scroll[1], 50, 50);
+			position = [p.x, p.y]
 		} else {
 			let c = color('#ff6565');
 			fill(c);
@@ -99,37 +100,33 @@ function draw() {
 		fill(c);
 		rectangle(p.x - scroll[0] + p.health/2 - 50, p.y - scroll[1] - 45, p.health, 10);
 	}
+	movement.x = 0;
+	movement.y = 0;
 	if (keystate[87]) {
-		velocity[1]--;
-		socket.emit("Position", position);
+		movement.y--;
+		socket.emit("Movement", movement);
 	}
 
 	if (keystate[65]) {
-		velocity[0]--;
-		socket.emit("Position", position);
+		movement.x--;
+		socket.emit("Movement", movement);
 	}
 	
 	if (keystate[83]) {
-		velocity[1]++;
-		socket.emit("Position", position);
+		movement.y++;
+		socket.emit("Movement", movement);
 	}
 
 	if (keystate[68]) {
-		velocity[0]++;
-		socket.emit("Position", position);
+		movement.x++;
+		socket.emit("Movement", movement);
 	}
 	if (keystate[32]) {
 		var angle = 	angle = atan2(mouseY - height / 2, mouseX - width / 2);
 		socket.emit("Shoot", position, angle);
 	}
+	console.log(movement)
 
-	velocity[0] *= 0.93;
-	velocity[1] *= 0.93;
-	if(!velocity[0] == 0 && !velocity[1] == 0) {
-		position[0] += velocity[0];
-		position[1] += velocity[1];
-		socket.emit("Position", position);
-	}
   scroll[0] += (position[0] - scroll[0] - windowWidth/2) / 7;
 	scroll[1] += (position[1] - scroll[1] - windowHeight/2) / 7;
 }

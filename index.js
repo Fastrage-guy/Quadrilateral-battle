@@ -36,6 +36,8 @@ io.on('connection', function(socket) {
 		players[socket.id] = {
 			x: rand(-250, 250),
 			y: rand(-250, 250),
+			vx: 0,
+			vy: 0,
 			health: 100,
 			kills: 0,
 			name: "Player: " + socket.id,
@@ -43,10 +45,10 @@ io.on('connection', function(socket) {
 		};
 		io.emit("floors", floors)
 		send()
-		socket.on("Position", function(position) {
+		socket.on("Movement", function(position) {
 			send();
-			players[socket.id].x = position[0];
-			players[socket.id].y = position[1]
+			players[socket.id].vx += position.x;
+			players[socket.id].vy += position.y;
 		});
 		socket.on("Shoot", function(position, angle) {
 			if(canshoot) {
@@ -123,4 +125,12 @@ function send(){
 
 setInterval(() => {
 	update();
-}, 1000/30);
+	for (i in players) {
+		p = players[i];
+		p.x += p.vx;
+		p.y += p.vy;
+		p.vy *= 0.9;
+		p.vx *= 0.9;
+	}
+	send();
+}, 1000/60);
