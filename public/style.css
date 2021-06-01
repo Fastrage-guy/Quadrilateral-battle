@@ -40,15 +40,6 @@ button {
 	height: 12%;
 }
 
-#respawnbutton {
-	position: absolute;
-  margin: auto;
-  right: 25px;
-  bottom: 25px;
-	z-index: 999999;
-	display: none;
-}
-
 canvas {
 	position:fixed;
 	top:0;
@@ -61,4 +52,18 @@ canvas {
 	margin:0;
 	padding:0;
 	overflow:hidden;
+}
+
+#chat{
+  position: absolute;
+  margin: auto;
+  bottom: 0;
+	z-index: 999999;
+  left: 0;
+  width: 40%;
+  height: 25%;
+  background-color: black;
+	opacity: 0.5;
+  border-radius: 5px;
+	color: white !important;
 }

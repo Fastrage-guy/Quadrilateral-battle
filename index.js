@@ -80,7 +80,8 @@ io.on('connection', function(socket) {
 		socket.on("Name", function(name) {
 			send();
 			players[socket.id].name = name;
-		})
+		});
+
 		socket.on('disconnect', () => {
 			console.log('User left: ' + socket.id)
 			delete players[socket.id] 

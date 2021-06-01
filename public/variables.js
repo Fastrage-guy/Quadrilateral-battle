@@ -2,6 +2,7 @@ var socket = io();
 var players = {};
 var bullets = {};
 var ammount;
+var canChat = true;
 var verbs = ["galloping", "running", "playing", "killing"]
 var nouns = ["human", "horse", "zombie", "stone", "player"]
 var position = [0, 0];

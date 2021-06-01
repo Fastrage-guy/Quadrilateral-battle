@@ -34,6 +34,7 @@ function move() {
 		var angle = 	angle = atan2(mouseY - height / 2, mouseX - width / 2);
 		socket.emit("Shoot", position, angle);
 	}
+
 	scroll[0] += (position[0] - scroll[0] - windowWidth/2) / 7;
 	scroll[1] += (position[1] - scroll[1] - windowHeight/2) / 7;
 }

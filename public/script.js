@@ -32,11 +32,15 @@ function draw() {
 document.body.innerHTML += `
 		<div id="JoinScreen">
 			<div id="container">
-				<h1>Rectangular Battle</h1>
+				<h1>Quadrilateral Battle</h1>
 				<input id="username" placeholder="Username" maxlength="14">
 				<button id="play" onclick="Play()">Play</button>
 			</div>
 		</div>
+		<div id="chat">Press / to chat\n</div>
+		<script>
+		setInterval(function(){document.getElementById("chats").scrollTop = document.getElementById("chats").scrollHeight}, 1)
+		</script>
 `
 
 socket.on("players", function(pack){
@@ -46,3 +50,4 @@ socket.on("players", function(pack){
 socket.on("bullets", function(pack){
 	bullets = pack;
 });
+
